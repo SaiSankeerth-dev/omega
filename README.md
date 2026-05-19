@@ -11,16 +11,16 @@ Omega is a modern, scalable, monorepo-based SaaS foundation built with Next.js, 
 ```
 omega/
 ├── apps/
-│   ├── web/          # Next.js frontend application
-│   └── server/       # Backend API server
+│   ├── web/              # Next.js frontend application
+│   └── server/           # Express API server + Prisma
 ├── packages/
-│   ├── shared/       # Shared types and utilities
-│   ├── ui/           # UI primitives and components
-│   └── config/       # Environment configuration & validation
-├── prisma/           # Prisma schema and migrations
-├── store/            # Zustand state management
-├── lib/              # Shared libraries (errors, API client)
-└── tests/            # Test suites
+│   ├── shared/           # Shared types, utilities, logger
+│   ├── ui/               # UI primitives and components
+│   └── config/           # Environment configuration & validation
+├── store/                # Zustand state management
+├── lib/                  # Shared libraries (errors, API client)
+├── tests/                # Test suites
+├── prisma/ → apps/server/prisma/
 ```
 
 ### Key Features
@@ -91,11 +91,12 @@ npm run db:push
 ### 6. Start development
 
 ```bash
-# Start frontend (Next.js)
+# Start both frontend + backend concurrently
 npm run dev
 
-# Start backend server (in another terminal)
-npm run dev:server
+# Or start individually:
+npm run dev:web   # Frontend only
+npm run dev:server  # Backend only
 ```
 
 - Frontend: [http://localhost:3000](http://localhost:3000)
@@ -108,18 +109,25 @@ npm run dev:server
 
 | Script | Description |
 |--------|-------------|
-| `npm run dev` | Start frontend dev server |
-| `npm run dev:server` | Start backend dev server |
-| `npm run build` | Build frontend for production |
-| `npm run build:server` | Build backend for production |
+| `npm run dev` | Start frontend + backend concurrently |
+| `npm run dev:web` | Start frontend dev server only |
+| `npm run dev:server` | Start backend dev server only |
+| `npm run build` | Build all apps for production |
+| `npm run build:web` | Build frontend only |
+| `npm run build:server` | Build backend only |
 | `npm run test` | Run all tests |
 | `npm run test:watch` | Run tests in watch mode |
 | `npm run lint` | Lint all apps and packages |
+| `npm run lint:fix` | Auto-fix lint issues |
 | `npm run format` | Format code with Prettier |
+| `npm run format:check` | Check format without writing |
 | `npm run typecheck` | Run TypeScript type checking |
+| `npm run typecheck:workspaces` | Typecheck all workspaces |
+| `npm run typecheck:all` | Typecheck root + all workspaces |
 | `npm run db:generate` | Generate Prisma client |
 | `npm run db:push` | Push schema to database |
 | `npm run db:studio` | Open Prisma Studio |
+| `npm run clean` | Remove all build artifacts |
 
 ---
 
@@ -184,7 +192,7 @@ Ensure all required environment variables are set in your production environment
 ## Tech Stack
 
 - **Frontend:** Next.js 16, React 19, Tailwind CSS 4
-- **Backend:** Bun server, Prisma 6
+- **Backend:** Express, Prisma 6
 - **Database:** MongoDB
 - **Language:** TypeScript (strict mode)
 - **State:** Zustand 5

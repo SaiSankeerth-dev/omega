@@ -22,10 +22,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:studio": "prisma studio",
-    "clean": "rm -rf node_modules .next dist"
+    "typecheck:workspaces": "npm run typecheck --workspaces",
+    "typecheck:all": "npm run typecheck && npm run typecheck:workspaces",
+    "db:generate": "prisma generate --schema apps/server/prisma/schema.prisma",
+    "db:push": "prisma db push --schema apps/server/prisma/schema.prisma",
+    "db:studio": "prisma studio --schema apps/server/prisma/schema.prisma",
+    "postinstall": "prisma generate --schema apps/server/prisma/schema.prisma",
+    "clean": "rimraf node_modules .next dist apps/web/.next apps/server/dist"
   },
   "dependencies": {
     "next": "16.2.6",
@@ -53,6 +56,9 @@
     "@testing-library/jest-dom": "^6",
     "prettier": "^3",
     "eslint-config-prettier": "^10",
-    "concurrently": "^9"
+    "concurrently": "^9",
+    "rimraf": "^6",
+    "jsdom": "^26",
+    "dotenv": "^16"
   }
 }

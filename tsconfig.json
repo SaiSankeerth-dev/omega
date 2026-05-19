@@ -13,6 +13,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "declaration": true,
+    "baseUrl": ".",
     "paths": {
       "@omega/shared": ["./packages/shared/src"],
       "@omega/ui": ["./packages/ui/src"],
@@ -27,5 +28,5 @@
     "tests/**/*.ts",
     "tests/**/*.tsx"
   ],
-  "exclude": ["node_modules", ".next", "dist", "apps"]
+  "exclude": ["node_modules", ".next", "dist"]
 }

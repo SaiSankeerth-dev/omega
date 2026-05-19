@@ -6,7 +6,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@omega/shared": "*",
@@ -17,7 +18,8 @@
     "helmet": "^8",
     "cors": "^2",
     "express-rate-limit": "^7",
-    "morgan": "^1"
+    "morgan": "^1",
+    "dotenv": "^16"
   },
   "devDependencies": {
     "@types/node": "^20",
