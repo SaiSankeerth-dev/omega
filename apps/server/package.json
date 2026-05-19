@@ -1,5 +1,5 @@
 {
-  "name": "@omega/server",
+  "name": "server",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,10 +12,18 @@
     "@omega/shared": "*",
     "@omega/config": "*",
     "@prisma/client": "^6",
-    "zod": "^3"
+    "zod": "^3",
+    "express": "^4",
+    "helmet": "^8",
+    "cors": "^2",
+    "express-rate-limit": "^7",
+    "morgan": "^1"
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/express": "^5",
+    "@types/cors": "^2",
+    "@types/morgan": "^1",
     "prisma": "^6",
     "tsx": "^4",
     "typescript": "^5"

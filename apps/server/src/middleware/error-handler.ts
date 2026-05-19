@@ -1,48 +1,48 @@
+import { Request, Response, NextFunction } from 'express';
 import { ApiError, logError } from '../../../../lib/errors';
 
-export interface ErrorResponse {
-  success: false;
-  error: {
-    code: string;
-    message: string;
-    details?: unknown;
-  };
-}
-
-export function handleApiError(error: unknown): Response {
-  if (error instanceof ApiError) {
-    return Response.json(
-      {
-        success: false,
-        error: {
-          code: error.code,
-          message: error.message,
-          ...(error.details ? { details: error.details } : {}),
-        },
+export function errorHandler(
+  err: Error,
+  _req: Request,
+  res: Response,
+  _next: NextFunction,
+): void {
+  if (err instanceof ApiError) {
+    res.status(err.statusCode).json({
+      success: false,
+      error: {
+        code: err.code,
+        message: err.message,
+        ...(err.details ? { details: err.details } : {}),
       },
-      { status: error.statusCode },
-    );
+    });
+    return;
   }
 
   // Log unexpected errors
-  logError('API', error);
+  logError('API', err);
 
   const message =
-    error instanceof Error
-      ? error.message
-      : 'An unexpected error occurred';
+    process.env.NODE_ENV === 'production'
+      ? 'Internal server error'
+      : err.message || 'Internal server error';
 
-  return Response.json(
-    {
-      success: false,
-      error: {
-        code: 'INTERNAL_ERROR',
-        message:
-          process.env.NODE_ENV === 'production'
-            ? 'Internal server error'
-            : message,
-      },
+  res.status(500).json({
+    success: false,
+    error: {
+      code: 'INTERNAL_ERROR',
+      message,
     },
-    { status: 500 },
-  );
+  });
+}
+
+// 404 handler for unknown routes
+export function notFoundHandler(_req: Request, res: Response): void {
+  res.status(404).json({
+    success: false,
+    error: {
+      code: 'NOT_FOUND',
+      message: 'The requested resource was not found',
+    },
+  });
 }

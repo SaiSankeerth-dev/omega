@@ -29,6 +29,11 @@ const eslintConfig = defineConfig([
     rules: {
       // Allow using styles without checking because Next.js handles CSS imports
       "@next/next/no-unused-css": "off",
+      // Allow underscore-prefixed unused params (e.g. Express error handlers)
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { "argsIgnorePattern": "^_" }
+      ],
     },
   },
 ]);

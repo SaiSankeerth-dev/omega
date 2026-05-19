@@ -1,4 +1,6 @@
-// Shared types for Omega
+// Shared types and utilities for Omega
+
+export * from './logger';
 
 // User types
 export interface User {
