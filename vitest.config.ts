@@ -3,17 +3,38 @@ import path from 'path';
 
 export default defineConfig({
   test: {
-    environment: 'node',
     globals: true,
-    include: ['tests/**/*.test.{ts,tsx}'],
-    exclude: ['node_modules', '.next', 'dist'],
-    setupFiles: [],
-  },
-  resolve: {
+    environment: 'node',
+    setupFiles: ['./tests/setup.ts'],
+    include: ['tests/**/*.test.ts', 'tests/**/*.spec.ts'],
+    exclude: ['node_modules', '.next', 'dist', '**/generated/**'],
+    testTimeout: 10000,
+    hookTimeout: 10000,
+
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html', 'lcov'],
+      reportsDirectory: './coverage',
+      exclude: [
+        'node_modules/**',
+        'dist/**',
+        '**/generated/**',
+        '**/*.config.*',
+        '**/index.ts',
+        'tests/**',
+      ],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 75,
+        statements: 80,
+      },
+    },
+
     alias: {
       '@omega/shared': path.resolve(__dirname, 'packages/shared/src'),
+      '@omega/types': path.resolve(__dirname, 'packages/types/src'),
       '@omega/config': path.resolve(__dirname, 'packages/config/src'),
-      '@omega/ui': path.resolve(__dirname, 'packages/ui/src'),
     },
   },
 });

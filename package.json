@@ -21,14 +21,16 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\"",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "typecheck:workspaces": "npm run typecheck --workspaces",
     "typecheck:all": "npm run typecheck && npm run typecheck:workspaces",
     "db:generate": "prisma generate --schema apps/server/prisma/schema.prisma",
     "db:push": "prisma db push --schema apps/server/prisma/schema.prisma",
     "db:studio": "prisma studio --schema apps/server/prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema apps/server/prisma/schema.prisma --name",
     "postinstall": "prisma generate --schema apps/server/prisma/schema.prisma",
-    "clean": "rimraf node_modules .next dist apps/web/.next apps/server/dist"
+    "clean": "rimraf apps/*/dist packages/*/dist coverage node_modules/.cache"
   },
   "dependencies": {
     "next": "16.2.6",
@@ -47,11 +49,16 @@
     "@types/express": "^5",
     "@types/cors": "^2",
     "@types/morgan": "^1",
+    "@types/compression": "^1",
+    "@types/hpp": "^0",
+    "@types/jsonwebtoken": "^9",
+    "@types/supertest": "^6",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^3",
+    "@vitest/coverage-v8": "^3",
     "@testing-library/react": "^16",
     "@testing-library/jest-dom": "^6",
     "prettier": "^3",
@@ -59,6 +66,15 @@
     "concurrently": "^9",
     "rimraf": "^6",
     "jsdom": "^26",
-    "dotenv": "^16"
+    "dotenv": "^16",
+    "express": "^4",
+    "helmet": "^8",
+    "cors": "^2",
+    "express-rate-limit": "^7",
+    "hpp": "^0",
+    "supertest": "^7",
+    "jsonwebtoken": "^9",
+    "compression": "^1",
+    "express-mongo-sanitize": "^2"
   }
 }

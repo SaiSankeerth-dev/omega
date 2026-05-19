@@ -1,23 +1,16 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2022"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitAny": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
     "outDir": "dist",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    "types": ["node"],
     "paths": {
-      "@omega/shared": ["../../packages/shared/src"],
-      "@omega/config": ["../../packages/config/src"]
+      "@omega/shared": ["./packages/shared/src/index.ts"],
+      "@omega/shared/*": ["./packages/shared/src/*"],
+      "@omega/config": ["./packages/config/src/env.ts"]
     }
   },
   "include": ["src/**/*.ts"],
