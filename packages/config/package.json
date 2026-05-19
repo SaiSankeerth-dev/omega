@@ -1,0 +1,14 @@
+{
+  "name": "@omega/config",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/env.ts",
+  "types": "./src/env.ts",
+  "dependencies": {
+    "zod": "^3"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "typescript": "^5"
+  }
+}

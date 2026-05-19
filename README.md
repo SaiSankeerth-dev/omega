@@ -1,36 +1,199 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ω Omega
+
+**A production-grade, open-source SaaS foundation.**
+
+Omega is a modern, scalable, monorepo-based SaaS foundation built with Next.js, MongoDB, and TypeScript. It provides a clean architecture with frontend/backend separation, shared types, UI primitives, and config validation out of the box.
+
+---
+
+## Architecture
+
+```
+omega/
+├── apps/
+│   ├── web/          # Next.js frontend application
+│   └── server/       # Backend API server
+├── packages/
+│   ├── shared/       # Shared types and utilities
+│   ├── ui/           # UI primitives and components
+│   └── config/       # Environment configuration & validation
+├── prisma/           # Prisma schema and migrations
+├── store/            # Zustand state management
+├── lib/              # Shared libraries (errors, API client)
+└── tests/            # Test suites
+```
+
+### Key Features
+
+- **Monorepo Architecture** — Clean separation between apps and packages with npm workspaces
+- **MongoDB + Prisma** — Type-safe database access with document-optimized models
+- **Strict TypeScript** — Full strict mode for maximum type safety
+- **Config Validation** — Zod-based env validation that crashes safely on misconfiguration
+- **Modular State** — Zustand stores separated into auth, editor, UI, and AI slices
+- **Centralized Error Handling** — Standardized API errors, logging, and frontend error boundaries
+- **Responsive UI** — Mobile-first responsive system with accessible components
+- **Testing Ready** — Vitest and Testing Library pre-configured
+- **Free & Open Source** — No pricing, quotas, or subscriptions
+
+---
+
+## Prerequisites
+
+- **Node.js** >= 18
+- **npm** >= 9
+- **MongoDB** >= 6.0 (local or remote instance)
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone the repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/your-username/omega.git
+cd omega
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Configure environment
 
-## Learn More
+Copy the example env file and fill in your values:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+cp .env.example .env
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Required environment variables:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | MongoDB connection string |
+| `JWT_SECRET` | Secret key for JWT tokens (min 32 chars) |
+| `OWNER_EMAIL` | Admin/owner email address |
 
-## Deploy on Vercel
+### 4. Generate Prisma client
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run db:generate
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 5. Push schema to MongoDB
+
+```bash
+npm run db:push
+```
+
+### 6. Start development
+
+```bash
+# Start frontend (Next.js)
+npm run dev
+
+# Start backend server (in another terminal)
+npm run dev:server
+```
+
+- Frontend: [http://localhost:3000](http://localhost:3000)
+- Backend API: [http://localhost:3001](http://localhost:3001)
+- Prisma Studio: `npm run db:studio`
+
+---
+
+## Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start frontend dev server |
+| `npm run dev:server` | Start backend dev server |
+| `npm run build` | Build frontend for production |
+| `npm run build:server` | Build backend for production |
+| `npm run test` | Run all tests |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run lint` | Lint all apps and packages |
+| `npm run format` | Format code with Prettier |
+| `npm run typecheck` | Run TypeScript type checking |
+| `npm run db:generate` | Generate Prisma client |
+| `npm run db:push` | Push schema to database |
+| `npm run db:studio` | Open Prisma Studio |
+
+---
+
+## Project Structure
+
+### Apps
+
+#### `apps/web` — Frontend
+Next.js application with app router, Tailwind CSS, and server components.
+
+#### `apps/server` — Backend
+API server with Prisma for database access and Zod for validation.
+
+### Packages
+
+#### `packages/shared`
+Shared TypeScript types and interfaces used across the entire project.
+
+#### `packages/ui`
+Reusable UI primitives: Button, Container, Input, ErrorBoundary, VisuallyHidden.
+
+#### `packages/config`
+Environment variable validation and type-safe configuration.
+
+### State Management
+
+Zustand stores in `/store`:
+- `auth` — Authentication state
+- `editor` — Editor/document state
+- `ui` — UI preferences (theme, sidebar, modals)
+- `ai` — AI chat and processing state
+
+### Libraries
+
+- `/lib/errors` — Centralized error handling (ApiError class, factory functions, logger)
+- `/lib/api-client` — Typed fetch wrapper with retry support
+
+---
+
+## Deployment
+
+### Frontend (Vercel)
+
+```bash
+npm run build
+# Deploy the apps/web directory to Vercel
+```
+
+### Backend
+
+```bash
+npm run build:server
+# Deploy apps/server/dist to your hosting provider
+```
+
+### Environment Variables
+
+Ensure all required environment variables are set in your production environment. The app will crash on startup with clear error messages if any required variable is missing.
+
+---
+
+## Tech Stack
+
+- **Frontend:** Next.js 16, React 19, Tailwind CSS 4
+- **Backend:** Bun server, Prisma 6
+- **Database:** MongoDB
+- **Language:** TypeScript (strict mode)
+- **State:** Zustand 5
+- **Validation:** Zod 3
+- **Testing:** Vitest, Testing Library
+- **Linting:** ESLint 9, Prettier 3
+
+---
+
+## License
+
+MIT — free and open-source.

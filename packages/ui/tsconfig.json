@@ -13,19 +13,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "declaration": true,
-    "paths": {
-      "@omega/shared": ["./packages/shared/src"],
-      "@omega/ui": ["./packages/ui/src"],
-      "@omega/config": ["./packages/config/src"]
-    }
+    "declarationMap": true,
+    "sourceMap": true
   },
-  "include": [
-    "packages/**/*.ts",
-    "packages/**/*.tsx",
-    "store/**/*.ts",
-    "lib/**/*.ts",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
-  ],
-  "exclude": ["node_modules", ".next", "dist", "apps"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules"]
 }
