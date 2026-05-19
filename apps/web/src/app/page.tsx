@@ -1,73 +1,14 @@
 import { Container } from "@omega/ui";
+import HeroNebula from "@/components/sections/HeroNebula";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Header */}
-      <header className="border-b border-zinc-200 dark:border-zinc-800" role="banner">
-        <Container size="lg" className="flex items-center justify-between py-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-bold tracking-tight" aria-label="Omega logo">
-              Ω Omega
-            </span>
-          </div>
-          <nav aria-label="Main navigation" className="flex items-center gap-6">
-            <a
-              href="/docs"
-              className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
-            >
-              Docs
-            </a>
-            <a
-              href="https://github.com"
-              className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              GitHub
-            </a>
-          </nav>
-        </Container>
-      </header>
+    <div className="flex flex-col">
+      {/* Hero with animated nebula canvas */}
+      <HeroNebula />
 
       {/* Main Content */}
       <main id="main-content" className="flex-1">
-        {/* Hero Section */}
-        <section aria-labelledby="hero-title" className="py-20 sm:py-28 lg:py-36">
-          <Container size="md" className="text-center">
-            <h1
-              id="hero-title"
-              className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
-            >
-              Build your next{" "}
-              <span className="text-zinc-500 dark:text-zinc-400">
-                SaaS
-              </span>{" "}
-              on Omega
-            </h1>
-            <p className="mt-6 text-lg leading-8 text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-              A production-grade, open-source foundation with MongoDB, strict TypeScript,
-              clean monorepo architecture, and modern tooling. Free and unrestricted.
-            </p>
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a
-                href="/docs"
-                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-lg bg-zinc-900 px-8 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-              >
-                Get started
-              </a>
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-12 w-full sm:w-auto items-center justify-center rounded-lg border border-zinc-300 px-8 text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-800"
-              >
-                View on GitHub
-              </a>
-            </div>
-          </Container>
-        </section>
-
         {/* Features Grid */}
         <section aria-labelledby="features-title" className="py-20 border-t border-zinc-200 dark:border-zinc-800">
           <Container size="lg">
