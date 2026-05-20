@@ -1,17 +1,37 @@
 @import "tailwindcss";
 
+/* ─── Design tokens ──────────────────────────────────────────────────────── */
+
 :root {
   --background: #020212;
   --foreground: #f8fafc;
-}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Brand */
+  --brand-500: #7c3aed;
+  --brand-600: #6d28d9;
+  --brand-400: #a78bfa;
+  --brand-gradient: linear-gradient(135deg, #7c3aed, #4f46e5);
 
-  /* Responsive breakpoints as CSS custom properties */
+  /* Surface */
+  --surface-1: rgba(255, 255, 255, 0.02);
+  --surface-2: rgba(255, 255, 255, 0.04);
+  --surface-3: rgba(255, 255, 255, 0.06);
+
+  /* Border */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.09);
+  --border-brand: rgba(124, 58, 237, 0.35);
+
+  /* Text */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
+
+  /* Shadows */
+  --shadow-brand: 0 0 24px rgba(124, 58, 237, 0.25);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* Breakpoints */
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
@@ -19,7 +39,38 @@
   --breakpoint-2xl: 1536px;
 }
 
-/* Reduced motion support */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* ─── Base reset ─────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans, Arial, Helvetica, sans-serif);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Reduce motion */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -31,36 +82,101 @@
   }
 }
 
-/* Focus visible styles */
+/* Focus */
 :focus-visible {
-  outline: 2px solid currentColor;
+  outline: 2px solid var(--brand-500);
   outline-offset: 2px;
 }
 
-/* Remove default focus outline for mouse users */
 :focus:not(:focus-visible) {
   outline: none;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-/* Custom bounce animation */
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(8px); }
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.animate-bounce {
-  animation: bounce 2s ease-in-out infinite;
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
 }
 
-/* Fade-in-up animation for hero content */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* Selection */
+::selection {
+  background: rgba(124, 58, 237, 0.3);
+  color: #fff;
+}
+
+/* ─── Utility classes ────────────────────────────────────────────────────── */
+
+.btn-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #fff;
+  background: var(--brand-gradient);
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.btn-brand:hover {
+  opacity: 0.92;
+  box-shadow: var(--shadow-brand);
+}
+
+.btn-brand:active {
+  transform: scale(0.98);
+}
+
+.btn-brand:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.glass-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.glass-card:hover {
+  background: var(--surface-2);
+  border-color: var(--border-default);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border-subtle);
+  border: none;
+  margin: 0;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #a78bfa 0%, #818cf8 50%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────────── */
+
+/* Fade in up */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -73,25 +189,73 @@ body {
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.8s ease-out forwards;
+  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-fade-in-up-delay-1 {
-  animation: fadeInUp 0.8s ease-out 0.15s forwards;
+  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
   opacity: 0;
 }
 
 .animate-fade-in-up-delay-2 {
-  animation: fadeInUp 0.8s ease-out 0.3s forwards;
+  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
   opacity: 0;
 }
 
 .animate-fade-in-up-delay-3 {
-  animation: fadeInUp 0.8s ease-out 0.45s forwards;
+  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.45s forwards;
   opacity: 0;
 }
 
-/* Slow pulse for gradient blobs */
+/* Scale in */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.93);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Slide in from right (toasts) */
+@keyframes slideInRight {
+  from {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Slide out to right */
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(110%);
+    opacity: 0;
+  }
+}
+
+.animate-slide-out-right {
+  animation: slideOutRight 0.22s ease-in forwards;
+}
+
+/* Slow pulses for blobs */
 @keyframes pulse-slow {
   0%, 100% { opacity: 0.15; transform: scale(1); }
   50% { opacity: 0.25; transform: scale(1.1); }
@@ -107,7 +271,49 @@ body {
   50% { opacity: 0.15; transform: scale(1.15); }
 }
 
-/* Drift animation for hero background blobs */
+.animate-pulse-slow { animation: pulse-slow 8s ease-in-out infinite; }
+.animate-pulse-slow-delayed { animation: pulse-slow-delayed 10s ease-in-out infinite; }
+.animate-pulse-slower { animation: pulse-slower 12s ease-in-out infinite; }
+
+/* Glow pulse for indicators */
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 1.8s ease-in-out infinite;
+}
+
+/* Shimmer for skeleton loaders */
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to { background-position: 200% center; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.07) 50%,
+    rgba(255, 255, 255, 0.03) 75%
+  );
+  background-size: 200% auto;
+  animation: shimmer 1.5s linear infinite;
+  border-radius: 8px;
+}
+
+/* Bounce (subtle, for hero scroll indicator) */
+@keyframes bounceY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+.animate-bounce {
+  animation: bounceY 2s ease-in-out infinite;
+}
+
+/* Drift for hero blobs */
 @keyframes drift {
   0% { transform: translate(0, 0) scale(1); }
   33% { transform: translate(30px, -30px) scale(1.05); }
@@ -115,25 +321,15 @@ body {
   100% { transform: translate(0, 0) scale(1); }
 }
 
-/* Slide in from right for toasts */
-@keyframes slideInRight {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+.animate-drift {
+  animation: drift 18s ease-in-out infinite;
 }
 
-.animate-slide-in-right {
-  animation: slideInRight 0.3s ease-out forwards;
+/* Spin */
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-/* Animated pulse ring for auth page */
-.animate-pulse-slow {
-  animation: pulse-slow 8s ease-in-out infinite;
-}
-
-.animate-pulse-slow-delayed {
-  animation: pulse-slow-delayed 10s ease-in-out infinite;
-}
-
-.animate-pulse-slower {
-  animation: pulse-slower 12s ease-in-out infinite;
+.animate-spin {
+  animation: spin 0.7s linear infinite;
 }
