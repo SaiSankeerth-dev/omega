@@ -1,19 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
 import { UnauthorizedError } from '@omega/shared/errors';
 import { asyncHandler } from './asyncHandler';
+import { verifyToken, type AccessTokenPayload } from '../lib/token';
+import { validateSession } from '../lib/sessions';
 
-export interface JwtPayload {
-  userId: string;
-  email: string;
-  iat: number;
-  exp: number;
-}
+export type JwtPayload = AccessTokenPayload;
 
 // Augment Express Request type
 declare module 'express' {
   interface Request {
     user?: JwtPayload;
+    sessionId?: string;
   }
 }
 
@@ -31,11 +28,15 @@ export const requireAuth = asyncHandler(
       throw new UnauthorizedError('No token provided');
     }
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) throw new Error('JWT_SECRET not configured');
+    const payload = verifyToken<JwtPayload>(token);
+    const validSession = await validateSession(payload.sessionId, payload.userId);
 
-    const payload = jwt.verify(token, secret) as JwtPayload;
+    if (!validSession) {
+      throw new UnauthorizedError('Session expired or revoked');
+    }
+
     req.user = payload;
+    req.sessionId = payload.sessionId;
     next();
   },
 );

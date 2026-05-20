@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/store/auth'
+import { useCommandPalette } from '@/components/CommandPalette'
 
 /* ─── Types ─────────────────────────────────────────────────────────────── */
 
@@ -42,7 +43,7 @@ const TYPE_BADGES: Record<string, { label: string; color: string; bg: string }> 
 
 export default function DashboardPage() {
   const router = useRouter()
-  const { user, setUser } = useAuthStore()
+  const { user, isAuthenticated, isLoading, loadMe, logout } = useAuthStore()
   const [sidebarExpanded, setSidebarExpanded] = useState(false)
   const greeting = (() => {
     const h = new Date().getHours()
@@ -52,38 +53,19 @@ export default function DashboardPage() {
   })()
 
   useEffect(() => {
-    /* Validate token on mount */
-    const token = localStorage.getItem('omega_token')
-    if (!token) {
+    void loadMe()
+  }, [loadMe])
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
       router.replace('/auth')
-      return
     }
+  }, [isAuthenticated, isLoading, router])
 
-    /* If no user in store, try fetching from API */
-    if (!user) {
-      fetch('http://localhost:3001/api/auth/me' /* TODO: use NEXT_PUBLIC_API_URL from env */, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((r) => r.json())
-        .then((data) => {
-          if (data.success && data.data?.user) {
-            setUser({
-              id: data.data.user.id,
-              email: data.data.user.email,
-              name: data.data.user.name ?? null,
-              avatarUrl: data.data.user.avatarUrl ?? null,
-              createdAt: data.data.user.createdAt ? new Date(data.data.user.createdAt) : new Date(),
-              updatedAt: new Date(),
-            })
-          }
-        })
-        .catch(() => {})
-    }
-  }, [router, user, setUser])
+  const { open: openPalette } = useCommandPalette()
 
-  const handleLogout = () => {
-    localStorage.removeItem('omega_token')
-    setUser(null)
+  const handleLogout = async () => {
+    await logout()
     router.push('/auth')
   }
 
@@ -112,6 +94,24 @@ export default function DashboardPage() {
 
         {/* Nav items */}
         <nav className="flex-1 py-4 space-y-1 px-2">
+          {/* Command palette trigger */}
+          <button
+            onClick={openPalette}
+            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-200"
+          >
+            <span className="text-lg shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+              </svg>
+            </span>
+            <span className={`flex items-center justify-between flex-1 transition-opacity duration-200 ${sidebarExpanded ? 'opacity-100' : 'opacity-0 overflow-hidden'}`}>
+              <span>Search</span>
+              <kbd className="text-[10px] text-gray-600 px-1 py-0.5 rounded border" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>⌘K</kbd>
+            </span>
+          </button>
+
+          <div className="my-2 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }} />
+
           {[
             { icon: '🏠', label: 'Home', active: true },
             { icon: '📁', label: 'Projects', active: false },

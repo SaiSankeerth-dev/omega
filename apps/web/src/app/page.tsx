@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useCommandPalette } from '@/components/CommandPalette'
 
 /* ─── Navbar ────────────────────────────────────────────────────────────── */
 
 function Navbar() {
   const [scrolled, setScrolled] = useState(false)
+  const { open: openPalette } = useCommandPalette()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -44,7 +46,22 @@ function Navbar() {
         </div>
 
         {/* Right actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          {/* Command palette trigger */}
+          <button
+            onClick={openPalette}
+            className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-gray-400 hover:text-white transition-all duration-200"
+            style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
+            aria-label="Open command palette"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+            </svg>
+            <kbd className="text-[10px] text-gray-500 px-1 py-0.5 rounded border" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+              ⌘K
+            </kbd>
+          </button>
+
           <a
             href="/auth"
             className="hidden sm:inline-flex px-4 py-2 rounded-xl text-sm font-medium text-gray-300 hover:text-white transition-colors"

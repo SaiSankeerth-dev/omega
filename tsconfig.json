@@ -26,7 +26,11 @@
       "@omega/shared/*": ["./packages/shared/src/*"],
       "@omega/types": ["./packages/types/src/index.ts"],
       "@omega/types/*": ["./packages/types/src/*"],
-      "@omega/config": ["./packages/config/src/env.ts"]
+      "@omega/config": ["./packages/config/src/env.ts"],
+      "@/components/*": ["./apps/web/src/components/*"],
+      "@/store/*": ["./apps/web/src/store/*"],
+      "@/lib/*": ["./apps/web/src/lib/*"],
+      "@/styles/*": ["./apps/web/src/styles/*"]
     }
   },
   "include": [
