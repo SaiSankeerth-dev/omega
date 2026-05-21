@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useCommandPalette } from '@/components/CommandPalette'
+import { GlowMenuBar } from '@/components/ui/glow-menu-bar'
+import { ParticleTextEffect } from '@/components/interactive-text-particle'
 
 /* ─── Navbar ────────────────────────────────────────────────────────────── */
 
@@ -32,17 +34,9 @@ function Navbar() {
           </span>
         </a>
 
-        {/* Center nav links — hidden on mobile */}
-        <div className="hidden md:flex items-center gap-8">
-          {['Features', 'Templates', 'AI Studio', 'Docs', 'Resources'].map((link) => (
-            <a
-              key={link}
-              href={link === 'Templates' ? '/templates' : link === 'AI Studio' ? '/editor/new' : '#'}
-              className="text-sm text-gray-400 hover:text-white transition-colors"
-            >
-              {link}
-            </a>
-          ))}
+        {/* Center — GlowMenuBar — hidden on mobile */}
+        <div className="hidden md:flex items-center">
+          <GlowMenuBar />
         </div>
 
         {/* Right actions */}
@@ -86,9 +80,24 @@ function Navbar() {
 function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Animated gradient blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        {/* Large slow-moving blobs */}
+      {/* Interactive Text Particle — full-canvas background */}
+      <div className="absolute inset-0 z-0" aria-hidden="true">
+        <ParticleTextEffect
+          text="OMEGA"
+          colors={['7c3aed', '4f46e5', '818cf8', 'a78bfa', '6366f1']}
+          animationForce={120}
+          particleDensity={3}
+          className="opacity-60"
+        />
+      </div>
+
+      {/* Gradient overlay for readability */}
+      <div className="absolute inset-0 pointer-events-none z-[1]" style={{
+        background: 'radial-gradient(ellipse at center, transparent 30%, #020212 80%)',
+      }} />
+
+      {/* Animated gradient blobs overlay */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]" aria-hidden="true">
         <div className="absolute -top-1/4 -left-1/4 w-[800px] h-[800px] rounded-full opacity-20"
           style={{
             background: 'radial-gradient(circle, rgba(139,92,246,0.3) 0%, transparent 70%)',
@@ -105,15 +114,6 @@ function HeroSection() {
           style={{
             background: 'radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 60%)',
             animation: 'drift 30s ease-in-out infinite',
-          }}
-        />
-
-        {/* Particle grid overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.15]"
-          style={{
-            backgroundImage: 'radial-gradient(circle, rgba(139,92,246,0.5) 1px, transparent 1px)',
-            backgroundSize: '40px 40px',
           }}
         />
       </div>
@@ -173,7 +173,7 @@ function HeroSection() {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce" aria-hidden="true">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce z-10" aria-hidden="true">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M6 9l6 6 6-6" />
         </svg>
@@ -321,7 +321,7 @@ function FooterSection() {
 
 export default function LandingPage() {
   return (
-    <main id="main-content" className="min-h-screen bg-[#050816]">
+    <main id="main-content" className="min-h-screen bg-[#020212]">
       <Navbar />
       <HeroSection />
       <FeatureCards />

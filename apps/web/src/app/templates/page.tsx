@@ -102,17 +102,16 @@ export default function TemplatesPage() {
           borderColor: 'rgba(255,255,255,0.06)',
         }}
       >
-        <nav className="max-w-7xl mx-auto flex items-center justify-between px-6 h-14">
-          <a href="/" className="flex items-center gap-2">
-            <span className="text-lg font-bold text-white" style={{ textShadow: '0 0 20px rgba(139,92,246,0.5)' }}>Ω Omega</span>
-          </a>
-          <div className="flex items-center gap-4">
-            <a href="/auth" className="text-sm text-gray-400 hover:text-white transition-colors">Sign In</a>
-            <a href="/auth"
-              className="px-4 py-1.5 rounded-xl text-xs font-semibold text-white transition-all hover:opacity-90"
-              style={{ background: 'linear-gradient(135deg, #7c3aed, #4f46e5)' }}
-            >Get Started</a>
-          </div>
+        <nav className="max-w-7xl mx-auto flex items-center justify-between px-6 h-14">            <a href="/" className="flex items-center gap-2">
+              <span className="text-lg font-bold text-white" style={{ textShadow: '0 0 20px rgba(139,92,246,0.5)' }}>Ω Omega</span>
+            </a>
+            <div className="flex items-center gap-3 sm:gap-4">
+              <a href="/dashboard" className="text-xs sm:text-sm text-gray-400 hover:text-white transition-colors">Dashboard</a>
+              <a href="/auth"
+                className="px-3 sm:px-4 py-1.5 rounded-xl text-xs font-semibold text-white transition-all hover:opacity-90"
+                style={{ background: 'linear-gradient(135deg, #7c3aed, #4f46e5)' }}
+              >Get Started</a>
+            </div>
         </nav>
       </header>
 

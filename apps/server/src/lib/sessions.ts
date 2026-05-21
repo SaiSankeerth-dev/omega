@@ -23,8 +23,8 @@ export const createSessionTokens = async (user: { id: string; email: string }): 
     },
   });
 
-  const accessToken = generateAccessToken(user.id, user.email, session.id);
-  const refreshToken = generateRefreshToken(user.id, session.id);
+  const accessToken = generateAccessToken({ userId: user.id, email: user.email, sessionId: session.id });
+  const refreshToken = generateRefreshToken({ userId: user.id, sessionId: session.id });
 
   await prisma.session.update({
     where: { id: session.id },
@@ -51,8 +51,8 @@ export const rotateRefreshToken = async (refreshToken: string): Promise<SessionT
   }
 
   const expiresAt = new Date(Date.now() + REFRESH_TOKEN_DAYS * 24 * 60 * 60 * 1000);
-  const nextAccessToken = generateAccessToken(session.user.id, session.user.email, session.id);
-  const nextRefreshToken = generateRefreshToken(session.user.id, session.id);
+  const nextAccessToken = generateAccessToken({ userId: session.user.id, email: session.user.email, sessionId: session.id });
+  const nextRefreshToken = generateRefreshToken({ userId: session.user.id, sessionId: session.id });
 
   await prisma.session.update({
     where: { id: session.id },

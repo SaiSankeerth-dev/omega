@@ -1,248 +1,150 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { prisma } from '../lib/prisma';
-import { requireAuth } from '../middleware/auth';
 import { asyncHandler } from '../middleware/asyncHandler';
-import { sendSuccess } from '@omega/shared/response';
-import { BadRequestError, NotFoundError } from '@omega/shared/errors';
-import { logger } from '@omega/shared/logger';
+import { requireAuth } from '../middleware/auth';
+import { prisma } from '../lib/prisma';
+import type { InputJsonValue } from '@prisma/client/runtime/library';
+import { sendSuccess, sendCreated, sendPaginated } from '@omega/shared/response';
+import { NotFoundError } from '@omega/shared/errors';
 
 export const projectRouter = Router();
 
-/* ─── Validation schemas ─────────────────────────────────────────────────── */
-
-const createProjectSchema = z.object({
-  name: z.string().min(1, 'Project name is required').max(120),
-  description: z.string().max(500).optional(),
-  workspaceId: z.string().optional(),
+const createSchema = z.object({
+  body: z.object({
+    name: z.string().min(1, 'Name is required').max(200),
+    description: z.string().max(1000).optional(),
+    type: z.enum(['presentation', 'website', 'document', 'story']).default('presentation'),
+  }),
 });
 
-const updateProjectSchema = z.object({
-  name: z.string().min(1).max(120).optional(),
-  description: z.string().max(500).optional().nullable(),
+const updateSchema = z.object({
+  body: z.object({
+    name: z.string().min(1).max(200).optional(),
+    description: z.string().max(1000).optional(),
+  }),
 });
 
-const saveDocumentSchema = z.object({
-  content: z.record(z.unknown()),
-});
-
-/* ─── GET /projects ──────────────────────────────────────────────────────── */
-
+// ── List user's projects ─────────────────────────────────────────────────
 projectRouter.get(
   '/',
   requireAuth,
   asyncHandler(async (req, res) => {
-    const userId = req.user!.userId;
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+    const skip = (page - 1) * limit;
 
-    const projects = await prisma.project.findMany({
-      where: { userId },
-      orderBy: { updatedAt: 'desc' },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        workspaceId: true,
-        createdAt: true,
-        updatedAt: true,
-        _count: { select: { documents: true } },
-      },
-    });
+    const [projects, total] = await Promise.all([
+      prisma.project.findMany({
+        where: { userId: req.user!.userId },
+        orderBy: { updatedAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.project.count({ where: { userId: req.user!.userId } }),
+    ]);
 
-    sendSuccess(res, { projects });
+    sendPaginated(res, projects, total, page, limit);
   }),
 );
 
-/* ─── POST /projects ─────────────────────────────────────────────────────── */
+// ── Get single project ──────────────────────────────────────────────────
+projectRouter.get(
+  '/:id',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const project = await prisma.project.findUnique({
+      where: { id: req.params.id as string },
+    });
 
+    if (!project || project.userId !== req.user!.userId) {
+      throw new NotFoundError('Project');
+    }
+
+    sendSuccess(res, { project });
+  }),
+);
+
+// ── Create project ──────────────────────────────────────────────────────
 projectRouter.post(
   '/',
   requireAuth,
   asyncHandler(async (req, res) => {
-    const userId = req.user!.userId;
-    const parsed = createProjectSchema.safeParse(req.body);
-
+    const parsed = createSchema.safeParse({ body: req.body });
     if (!parsed.success) {
-      throw new BadRequestError(parsed.error.errors[0]?.message ?? 'Invalid input');
-    }
-
-    const { name, description, workspaceId } = parsed.data;
-
-    // Verify workspace ownership if provided
-    if (workspaceId) {
-      const ws = await prisma.workspace.findUnique({ where: { id: workspaceId } });
-      if (!ws || ws.ownerId !== userId) {
-        throw new BadRequestError('Invalid workspace');
+      const firstError = parsed.error.errors[0];
+      if (!firstError) {
+        throw new NotFoundError('Invalid input');
       }
+      throw new NotFoundError(firstError.message);
     }
+
+    const { name, description, type } = parsed.data.body;
 
     const project = await prisma.project.create({
       data: {
         name,
-        description,
-        userId,
-        workspaceId,
+        description: description ?? null,
+        type,
+        userId: req.user!.userId,
         documents: {
           create: {
-            content: { blocks: [] },
-            version: 1,
+            content: {
+              blocks: [
+                { id: '1', type: 'heading', content: name || 'Untitled Project' },
+                { id: '2', type: 'text', content: 'Start editing your content here...' },
+              ],
+            } as InputJsonValue,
           },
         },
       },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        workspaceId: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
 
-    logger.info('Projects', `Created project "${name}" for user ${userId}`);
-    sendSuccess(res, { project }, 201);
+    sendCreated(res, { project });
   }),
 );
 
-/* ─── GET /projects/:id ──────────────────────────────────────────────────── */
-
-projectRouter.get(
+// ── Update project ──────────────────────────────────────────────────────
+projectRouter.put(
   '/:id',
   requireAuth,
   asyncHandler(async (req, res) => {
-    const userId = req.user!.userId;
-    const { id } = req.params;
-
-    const project = await prisma.project.findFirst({
-      where: { id, userId },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        workspaceId: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+    const existing = await prisma.project.findUnique({
+      where: { id: req.params.id as string },
     });
 
-    if (!project) throw new NotFoundError('Project not found');
-
-    sendSuccess(res, { project });
-  }),
-);
-
-/* ─── PATCH /projects/:id ────────────────────────────────────────────────── */
-
-projectRouter.patch(
-  '/:id',
-  requireAuth,
-  asyncHandler(async (req, res) => {
-    const userId = req.user!.userId;
-    const { id } = req.params;
-
-    const parsed = updateProjectSchema.safeParse(req.body);
-    if (!parsed.success) {
-      throw new BadRequestError(parsed.error.errors[0]?.message ?? 'Invalid input');
+    if (!existing || existing.userId !== req.user!.userId) {
+      throw new NotFoundError('Project');
     }
 
-    const existing = await prisma.project.findFirst({ where: { id, userId } });
-    if (!existing) throw new NotFoundError('Project not found');
+    const parsed = updateSchema.safeParse({ body: req.body });
+    if (!parsed.success) {
+      throw new NotFoundError(parsed.error.errors[0]?.message ?? 'Invalid input');
+    }
 
     const project = await prisma.project.update({
-      where: { id },
-      data: parsed.data,
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        workspaceId: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      where: { id: req.params.id as string },
+      data: parsed.data.body,
     });
 
     sendSuccess(res, { project });
   }),
 );
 
-/* ─── DELETE /projects/:id ───────────────────────────────────────────────── */
-
+// ── Delete project ──────────────────────────────────────────────────────
 projectRouter.delete(
   '/:id',
   requireAuth,
   asyncHandler(async (req, res) => {
-    const userId = req.user!.userId;
-    const { id } = req.params;
+    const existing = await prisma.project.findUnique({
+      where: { id: req.params.id as string },
+    });
 
-    const existing = await prisma.project.findFirst({ where: { id, userId } });
-    if (!existing) throw new NotFoundError('Project not found');
+    if (!existing || existing.userId !== req.user!.userId) {
+      throw new NotFoundError('Project');
+    }
 
-    // Cascade: delete documents and AI history first (Prisma handles this via schema relations)
-    await prisma.project.delete({ where: { id } });
+    await prisma.project.delete({ where: { id: req.params.id as string } });
 
-    logger.info('Projects', `Deleted project ${id} for user ${userId}`);
     sendSuccess(res, { ok: true });
-  }),
-);
-
-/* ─── GET /projects/:id/document ─────────────────────────────────────────── */
-
-projectRouter.get(
-  '/:id/document',
-  requireAuth,
-  asyncHandler(async (req, res) => {
-    const userId = req.user!.userId;
-    const { id } = req.params;
-
-    const project = await prisma.project.findFirst({ where: { id, userId } });
-    if (!project) throw new NotFoundError('Project not found');
-
-    const document = await prisma.editorDocument.findFirst({
-      where: { projectId: id },
-      orderBy: { version: 'desc' },
-    });
-
-    sendSuccess(res, { document });
-  }),
-);
-
-/* ─── PUT /projects/:id/document ─────────────────────────────────────────── */
-
-projectRouter.put(
-  '/:id/document',
-  requireAuth,
-  asyncHandler(async (req, res) => {
-    const userId = req.user!.userId;
-    const { id } = req.params;
-
-    const parsed = saveDocumentSchema.safeParse(req.body);
-    if (!parsed.success) {
-      throw new BadRequestError(parsed.error.errors[0]?.message ?? 'Invalid content');
-    }
-
-    const project = await prisma.project.findFirst({ where: { id, userId } });
-    if (!project) throw new NotFoundError('Project not found');
-
-    // Upsert the latest document version
-    const existing = await prisma.editorDocument.findFirst({
-      where: { projectId: id },
-      orderBy: { version: 'desc' },
-    });
-
-    let document;
-    if (existing) {
-      document = await prisma.editorDocument.update({
-        where: { id: existing.id },
-        data: { content: parsed.data.content },
-      });
-    } else {
-      document = await prisma.editorDocument.create({
-        data: { projectId: id, content: parsed.data.content, version: 1 },
-      });
-    }
-
-    // Bump project updatedAt
-    await prisma.project.update({ where: { id }, data: { updatedAt: new Date() } });
-
-    sendSuccess(res, { document });
   }),
 );

@@ -35,6 +35,21 @@ export const sendCreated = <T>(res: ResLike, data: T) =>
 export const sendNoContent = (res: ResLike) =>
   res.status(204).send();
 
+export const sendError = (
+  res: ResLike,
+  message: string,
+  statusCode = 400,
+  code?: string,
+) => {
+  return res.status(statusCode).json({
+    success: false,
+    error: {
+      message,
+      ...(code && { code }),
+    },
+  });
+};
+
 export const sendPaginated = <T>(
   res: ResLike,
   data: T[],

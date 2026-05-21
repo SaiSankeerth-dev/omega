@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/store/auth'
+import { SplineScene } from '@/components/ui/splite'
 
 export default function AuthPage() {
   const router = useRouter()
@@ -33,8 +34,21 @@ export default function AuthPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#03020a] text-white flex items-center justify-center px-4 py-16">
-      <section className="w-full max-w-md rounded-3xl border border-white/10 bg-white/[0.06] p-8 shadow-2xl shadow-violet-950/30 backdrop-blur-xl">
+    <main className="min-h-screen bg-[#03020a] text-white flex items-center justify-center px-4 py-16 relative overflow-hidden">
+      {/* ── Spline Scene Background ──────────────────────────────────────── */}
+      <div className="absolute inset-0 z-0 opacity-60" aria-hidden="true">
+        <SplineScene
+          scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode"
+          className="w-full h-full"
+        />
+      </div>
+
+      {/* Gradient overlay for form readability */}
+      <div className="absolute inset-0 z-[1] pointer-events-none" style={{
+        background: 'radial-gradient(ellipse at center, transparent 40%, #03020a 85%)',
+      }} />
+
+      <section className="relative z-10 w-full max-w-md rounded-3xl border border-white/10 bg-white/[0.06] p-8 shadow-2xl shadow-violet-950/30 backdrop-blur-xl">
         <div className="mb-8 text-center">
           <p className="mb-3 text-sm uppercase tracking-[0.32em] text-violet-300">Omega AI</p>
           <h1 className="text-3xl font-semibold tracking-tight">

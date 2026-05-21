@@ -1,6 +1,7 @@
 import http from 'http';
 import app from '../index';
 import { connectDB, disconnectDB } from './prisma';
+import { setupWebSocket } from './websocket';
 import { logger } from '@omega/shared/logger';
 
 const PORT = Number(process.env.PORT ?? 4000);
@@ -12,6 +13,9 @@ async function bootstrap(): Promise<void> {
   await connectDB();
 
   server = http.createServer(app);
+
+  // Setup WebSocket for realtime collaboration
+  setupWebSocket(server);
 
   server.listen(PORT, () => {
     logger.info('Server', `Listening on port ${PORT}`);

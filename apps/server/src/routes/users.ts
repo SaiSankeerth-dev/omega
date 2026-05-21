@@ -24,6 +24,7 @@ userRouter.get(
 
 userRouter.get(
   '/:id',
+  requireAuth,
   asyncHandler(async (req, res) => {
     const user = await prisma.user.findUnique({
       where: { id: req.params.id as string },

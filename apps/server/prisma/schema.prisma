@@ -12,23 +12,36 @@ enum Role {
   ADMIN
 }
 
+enum OrgRole {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
 model User {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   email         String    @unique
   name          String?
   passwordHash  String
+  githubId      String?   @unique
+  avatarUrl     String?
   role          Role      @default(USER)
   emailVerified Boolean   @default(false)
-  avatarUrl     String?
   lastLoginAt   DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   projects   Project[]
   workspaces Workspace[]
+  memberships OrgMember[]
   templates  Template[]
   aiHistory  AIHistory[]
   sessions   Session[]
+  versions   DocumentVersion[]
+  notifications Notification[]
+  organizations Organization[]
+  auditLogs AuditLog[]
 
   @@map("users")
 }
@@ -50,18 +63,24 @@ model Project {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
+  type        String   @default("presentation")
   userId      String   @db.ObjectId
   workspaceId String?  @db.ObjectId
+  organizationId String? @db.ObjectId
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   user      User       @relation(fields: [userId], references: [id])
   workspace Workspace? @relation(fields: [workspaceId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id])
   documents EditorDocument[]
+  slides    Slide[]
   aiHistory AIHistory[]
+  versions  DocumentVersion[]
 
   @@index([userId])
   @@index([workspaceId])
+  @@index([organizationId])
 }
 
 model Workspace {
@@ -78,13 +97,48 @@ model Workspace {
   @@index([ownerId])
 }
 
+model Organization {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  slug        String   @unique
+  logoUrl     String?
+  ownerId     String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner    User       @relation(fields: [ownerId], references: [id])
+  members  OrgMember[]
+  projects Project[]
+
+  @@index([ownerId])
+}
+
+model OrgMember {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  organizationId String   @db.ObjectId
+  userId         String   @db.ObjectId
+  role           OrgRole  @default(EDITOR)
+  joinedAt       DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@index([userId])
+}
+
 model Template {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
+  category    String   @default("Presentations")
   content     Json
   userId      String   @db.ObjectId
   isPublic    Boolean  @default(false)
+  price       Int      @default(0)
+  downloads   Int      @default(0)
+  rating      Float    @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -92,6 +146,24 @@ model Template {
 
   @@index([userId])
   @@index([isPublic])
+  @@index([category])
+}
+
+model Slide {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  projectId String   @db.ObjectId
+  title     String   @default("Untitled Slide")
+  content   Json
+  order     Int      @default(0)
+  transition String  @default("fade")
+  duration  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([order])
 }
 
 model AIHistory {
@@ -123,4 +195,109 @@ model EditorDocument {
   project Project @relation(fields: [projectId], references: [id])
 
   @@index([projectId])
+}
+
+model DocumentVersion {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  projectId String   @db.ObjectId
+  content   Json
+  version   Int
+  title     String
+  message   String   @default("")
+  userId    String   @db.ObjectId
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@index([projectId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  action    String
+  resource  String
+  resourceId String?
+  details   String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([resource])
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String?
+  event     String
+  properties Json?
+  page      String?
+  sessionId String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([event])
+  @@index([createdAt])
+  @@index([page])
+}
+
+model Plugin {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  version     String   @default("1.0.0")
+  author      String
+  authorId    String   @db.ObjectId
+  icon        String?
+  category    String   @default("Other")
+  isPublic    Boolean  @default(false)
+  downloads   Int      @default(0)
+  config      Json?
+  source      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([authorId])
+  @@index([isPublic])
+  @@index([category])
+}
+
+model Workflow {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  userId      String   @db.ObjectId
+  trigger     String   @default("manual")
+  steps       Json
+  enabled     Boolean  @default(true)
+  lastRun     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([enabled])
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  type      String
+  title     String
+  message   String?
+  read      Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
 }

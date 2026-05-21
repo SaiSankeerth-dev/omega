@@ -5,6 +5,7 @@ export interface AccessTokenPayload {
   userId: string;
   email: string;
   sessionId: string;
+  role?: string;
   iat: number;
   exp: number;
 }
@@ -24,11 +25,11 @@ const secret = (): string => {
   return s;
 };
 
-export const generateAccessToken = (userId: string, email: string, sessionId: string): string =>
-  jwt.sign({ userId, email, sessionId }, secret(), { expiresIn: TOKEN_EXPIRY.ACCESS });
+export const generateAccessToken = (payload: { userId: string; email: string; sessionId: string; role?: string }): string =>
+  jwt.sign(payload, secret(), { expiresIn: TOKEN_EXPIRY.ACCESS });
 
-export const generateRefreshToken = (userId: string, sessionId: string): string =>
-  jwt.sign({ userId, sessionId }, secret(), { expiresIn: TOKEN_EXPIRY.REFRESH });
+export const generateRefreshToken = (payload: { userId: string; sessionId: string }): string =>
+  jwt.sign(payload, secret(), { expiresIn: TOKEN_EXPIRY.REFRESH });
 
 export const verifyToken = <T>(token: string): T =>
   jwt.verify(token, secret()) as T;

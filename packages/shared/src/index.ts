@@ -21,6 +21,7 @@ export interface Project {
   id: string;
   name: string;
   description: string | null;
+  type: string;
   userId: string;
   workspaceId: string | null;
   createdAt: Date;
@@ -42,6 +43,7 @@ export interface Template {
   id: string;
   name: string;
   description: string | null;
+  category: string;
   content: Record<string, unknown>;
   userId: string;
   isPublic: boolean;

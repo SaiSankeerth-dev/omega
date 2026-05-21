@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@omega/ui";
 import { CommandPaletteProvider } from "@/components/CommandPalette";
 import { ToastProvider } from "@/components/ToastProvider";
+import { ShortcutsProvider } from "@/components/ui/KeyboardShortcuts";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -43,7 +44,8 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider>
           <CommandPaletteProvider>
-            <ToastProvider>
+            <ShortcutsProvider>
+              <ToastProvider>
               {/* Skip to main content link for accessibility */}
               <a
                 href="#main-content"
@@ -52,7 +54,8 @@ export default function RootLayout({
                 Skip to main content
               </a>
               {children}
-            </ToastProvider>
+              </ToastProvider>
+            </ShortcutsProvider>
           </CommandPaletteProvider>
         </ThemeProvider>
       </body>

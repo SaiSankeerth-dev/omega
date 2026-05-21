@@ -67,3 +67,6 @@ export const api = {
   delete: <T>(endpoint: string, token?: string) =>
     request<T>(endpoint, { method: 'DELETE' }, token),
 };
+
+// Re-export for backward compatibility
+export const apiClient = api;
