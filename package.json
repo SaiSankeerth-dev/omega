@@ -33,12 +33,17 @@
     "clean": "rimraf apps/*/dist packages/*/dist coverage node_modules/.cache"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@prisma/client": "^6",
     "@splinetool/react-spline": "^4.1.0",
     "@splinetool/runtime": "^1.12.94",
     "clsx": "^2.1.1",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
+=======
+    "@anthropic-ai/sdk": "^0.97.1",
+    "@prisma/client": "^6",
+>>>>>>> f9bdc7a (Phase 1 AI integration: OpenRouter provider, modular AI routes, chat/presentation UI, SSE streaming)
     "next": "16.2.6",
     "prisma": "^6",
     "react": "19.2.4",
@@ -67,7 +72,10 @@
     "concurrently": "^9",
     "cors": "^2",
     "dotenv": "^16",
+<<<<<<< HEAD
     "electron": "^42.2.0",
+=======
+>>>>>>> f9bdc7a (Phase 1 AI integration: OpenRouter provider, modular AI routes, chat/presentation UI, SSE streaming)
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "eslint-config-prettier": "^10",

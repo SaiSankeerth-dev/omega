@@ -1,0 +1,16 @@
+{
+  "name": "@omega/ai",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "description": "Omega AI provider abstraction, prompts, and utilities",
+  "type": "module",
+  "main": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./providers": "./providers/index.ts",
+    "./prompts": "./prompts/index.ts"
+  }
+}

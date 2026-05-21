@@ -1,5 +1,11 @@
 import { Router } from 'express';
 import { z } from 'zod';
+<<<<<<< HEAD
+=======
+import type { Prisma } from '@prisma/client';
+import { prisma } from '../lib/prisma';
+import { requireAuth } from '../middleware/auth';
+>>>>>>> f9bdc7a (Phase 1 AI integration: OpenRouter provider, modular AI routes, chat/presentation UI, SSE streaming)
 import { asyncHandler } from '../middleware/asyncHandler';
 import { requireAuth } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
@@ -108,12 +114,48 @@ projectRouter.put(
   '/:id',
   requireAuth,
   asyncHandler(async (req, res) => {
+<<<<<<< HEAD
     const existing = await prisma.project.findUnique({
       where: { id: req.params.id as string },
     });
 
     if (!existing || existing.userId !== req.user!.userId) {
       throw new NotFoundError('Project');
+=======
+    const userId = req.user!.userId;
+    const id = req.params.id as string;
+
+    const project = await prisma.project.findFirst({
+      where: { id, userId },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        workspaceId: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!project) throw new NotFoundError('Project not found');
+
+    sendSuccess(res, { project });
+  }),
+);
+
+/* ─── PATCH /projects/:id ────────────────────────────────────────────────── */
+
+projectRouter.patch(
+  '/:id',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const userId = req.user!.userId;
+    const id = req.params.id as string;
+
+    const parsed = updateProjectSchema.safeParse(req.body);
+    if (!parsed.success) {
+      throw new BadRequestError(parsed.error.errors[0]?.message ?? 'Invalid input');
+>>>>>>> f9bdc7a (Phase 1 AI integration: OpenRouter provider, modular AI routes, chat/presentation UI, SSE streaming)
     }
 
     const parsed = updateSchema.safeParse({ body: req.body });
@@ -135,9 +177,14 @@ projectRouter.delete(
   '/:id',
   requireAuth,
   asyncHandler(async (req, res) => {
+<<<<<<< HEAD
     const existing = await prisma.project.findUnique({
       where: { id: req.params.id as string },
     });
+=======
+    const userId = req.user!.userId;
+    const id = req.params.id as string;
+>>>>>>> f9bdc7a (Phase 1 AI integration: OpenRouter provider, modular AI routes, chat/presentation UI, SSE streaming)
 
     if (!existing || existing.userId !== req.user!.userId) {
       throw new NotFoundError('Project');
@@ -148,3 +195,69 @@ projectRouter.delete(
     sendSuccess(res, { ok: true });
   }),
 );
+<<<<<<< HEAD
+=======
+
+/* ─── GET /projects/:id/document ─────────────────────────────────────────── */
+
+projectRouter.get(
+  '/:id/document',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const userId = req.user!.userId;
+    const id = req.params.id as string;
+
+    const project = await prisma.project.findFirst({ where: { id, userId } });
+    if (!project) throw new NotFoundError('Project not found');
+
+    const document = await prisma.editorDocument.findFirst({
+      where: { projectId: id },
+      orderBy: { version: 'desc' },
+    });
+
+    sendSuccess(res, { document });
+  }),
+);
+
+/* ─── PUT /projects/:id/document ─────────────────────────────────────────── */
+
+projectRouter.put(
+  '/:id/document',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const userId = req.user!.userId;
+    const id = req.params.id as string;
+
+    const parsed = saveDocumentSchema.safeParse(req.body);
+    if (!parsed.success) {
+      throw new BadRequestError(parsed.error.errors[0]?.message ?? 'Invalid content');
+    }
+
+    const project = await prisma.project.findFirst({ where: { id, userId } });
+    if (!project) throw new NotFoundError('Project not found');
+
+    // Upsert the latest document version
+    const existing = await prisma.editorDocument.findFirst({
+      where: { projectId: id },
+      orderBy: { version: 'desc' },
+    });
+
+    let document;
+    if (existing) {
+      document = await prisma.editorDocument.update({
+        where: { id: existing.id },
+        data: { content: parsed.data.content as Prisma.InputJsonValue },
+      });
+    } else {
+      document = await prisma.editorDocument.create({
+        data: { projectId: id, content: parsed.data.content as Prisma.InputJsonValue, version: 1 },
+      });
+    }
+
+    // Bump project updatedAt
+    await prisma.project.update({ where: { id }, data: { updatedAt: new Date() } });
+
+    sendSuccess(res, { document });
+  }),
+);
+>>>>>>> f9bdc7a (Phase 1 AI integration: OpenRouter provider, modular AI routes, chat/presentation UI, SSE streaming)
