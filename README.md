@@ -201,3 +201,6 @@ Ensure all required environment variables are set in your production environment
 - **Linting:** ESLint 9, Prettier 3
 
 ---
+📄 License
+
+This project is open-source and available under the MIT License.
