@@ -1,5 +1,7 @@
 # Ω Omega
 
+![License](https://img.shields.io/github/license/SaiSankeerth-dev/omega) ![Next.js](https://img.shields.io/badge/frontend-Next.js%2016-000000?logo=next.js) ![TypeScript](https://img.shields.io/badge/strict-TypeScript-3178C6?logo=typescript)
+
 **A production-grade, open-source SaaS foundation.**
 
 Omega is a modern, scalable, monorepo-based SaaS foundation built with Next.js, MongoDB, and TypeScript. It provides a clean architecture with frontend/backend separation, shared types, UI primitives, and config validation out of the box.
@@ -50,7 +52,7 @@ omega/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/omega.git
+git clone https://github.com/SaiSankeerth-dev/omega.git
 cd omega
 ```
 
@@ -201,6 +203,11 @@ Ensure all required environment variables are set in your production environment
 - **Linting:** ESLint 9, Prettier 3
 
 ---
-📄 License
 
-This project is open-source and available under the MIT License.
+## Docs
+
+[ARCHITECTURE.md](ARCHITECTURE.md) · [ROADMAP.md](ROADMAP.md) · [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## License
+
+MIT — see [LICENSE](LICENSE).
