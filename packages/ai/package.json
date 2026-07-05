@@ -12,6 +12,8 @@
     ".": "./index.ts",
     "./index": "./index.ts",
     "./providers": "./providers/index.ts",
+    "./providers/common": "./providers/common.js",
+    "./providers/common.js": "./providers/common.ts",
     "./prompts": "./prompts/index.ts",
     "./health": "./health.js",
     "./health.js": "./health.ts",
