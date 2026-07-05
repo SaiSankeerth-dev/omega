@@ -10,7 +10,10 @@
   "main": "./index.ts",
   "exports": {
     ".": "./index.ts",
+    "./index": "./index.ts",
     "./providers": "./providers/index.ts",
-    "./prompts": "./prompts/index.ts"
+    "./prompts": "./prompts/index.ts",
+    "./health": "./health.js",
+    "./metrics": "./metrics.js"
   }
 }
