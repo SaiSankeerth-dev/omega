@@ -41,7 +41,9 @@ aiRouter.post('/generate', async (req, res) => {
       { role: 'system' as const, content: PROMPTS.ACTION_SYSTEM(action) },
       { role: 'user'   as const, content: context ? `Context:\n${context}\n\nContent:\n${content}` : content },
     ];
-    const response = await provider.generate(messages, { temperature: 0.7, maxTokens: 2048 });
+    // Use retry wrapper to improve resiliency on transient errors
+    const { callWithRetries } = await import('@omega/ai/providers/common.js');
+    const response = await callWithRetries(() => provider.generate(messages, { temperature: 0.7, maxTokens: 2048 }), 3, 300);
     res.json({ success: true, data: { content: response, action } });
   } catch (err) {
     res.status(502).json({ success: false, error: err instanceof Error ? err.message : 'Generation failed' });
@@ -71,10 +73,20 @@ aiRouter.post('/generate/stream', async (req, res) => {
       { role: 'system' as const, content: PROMPTS.ACTION_SYSTEM(action) },
       { role: 'user'   as const, content: context ? `Context:\n${context}\n\nContent:\n${content}` : content },
     ];
-    for await (const chunk of provider.stream(messages, { temperature: 0.7 })) {
-      if (res.writableEnded) break;
-      res.write(`data: ${JSON.stringify(chunk)}\n\n`);
-      if (chunk.done || chunk.error) break;
+    // Stream directly; if stream fails, fall back to a retried generate call
+    try {
+      for await (const chunk of provider.stream(messages, { temperature: 0.7 })) {
+        if (res.writableEnded) break;
+        res.write(`data: ${JSON.stringify(chunk)}\n\n`);
+        if (chunk.done || chunk.error) break;
+      }
+    } catch (streamErr) {
+      // Attempt a retried generate as fallback
+      const { callWithRetries } = await import('@omega/ai/providers/common.js');
+      const fallback = await callWithRetries(() => provider.generate(messages, { temperature: 0.7, maxTokens: 2048 }), 2, 500);
+      if (!res.writableEnded) {
+        res.write(`data: ${JSON.stringify({ delta: fallback, done: true })}\n\n`);
+      }
     }
   } catch (err) {
     if (!res.writableEnded) {
