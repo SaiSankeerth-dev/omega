@@ -14,6 +14,8 @@
     "./providers": "./providers/index.ts",
     "./prompts": "./prompts/index.ts",
     "./health": "./health.js",
-    "./metrics": "./metrics.js"
+    "./health.js": "./health.ts",
+    "./metrics": "./metrics.js",
+    "./metrics.js": "./metrics.ts"
   }
 }
