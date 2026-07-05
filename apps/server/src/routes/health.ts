@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { logger } from '@omega/shared/logger';
+import { providerHealth } from '@omega/ai/health.js';
+import { snapshot } from '@omega/ai/metrics.js';
 
 export const healthRouter = Router();
 
@@ -27,4 +29,15 @@ healthRouter.get('/', async (_, res) => {
       timestamp: new Date().toISOString(),
     });
   }
+});
+
+// AI provider health
+healthRouter.get('/ai', async (_, res) => {
+  const h = await providerHealth();
+  res.json(h);
+});
+
+// Simple in-memory metrics endpoint for quick monitoring
+healthRouter.get('/metrics', (_, res) => {
+  res.json(snapshot());
 });
